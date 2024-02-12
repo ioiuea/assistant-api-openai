@@ -14,21 +14,26 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Assistant ID is required" });
   }
 
-  const openai = new OpenAI({
-    apiKey: AZURE_OPENAI_API_KEY,
-    baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
-    defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-    defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-  });
+  let openai;
+  if (process.env.AZURE_OPENAI_API === 'true') {
+    openai = new OpenAI({
+      apiKey: AZURE_OPENAI_API_KEY,
+      baseURL: AZURE_OPENAI_API_RESOURCE,
+      defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+      defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+    });
+  } else {
+    openai = new OpenAI();
+  }
 
-  console.log('Assistant ID:', assistantId);
+  // console.log('Assistant ID:', assistantId);
 
   try {
     const assistants = await openai.beta.assistants.retrieve(assistantId);
 
     // const assistants = response.data;
 
-    console.log(assistants);
+    // console.log(assistants);
 
     return Response.json({ assistants: assistants });
   } catch (e) {

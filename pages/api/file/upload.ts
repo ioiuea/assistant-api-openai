@@ -42,12 +42,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       // Create a ReadStream from the file
       const fileStream = createReadStream(file.filepath);
 
-      const openai = new OpenAI({
-        apiKey: AZURE_OPENAI_API_KEY,
-        baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
-        defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-        defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-      });
+      let openai;
+      if (process.env.AZURE_OPENAI_API === 'true') {
+        openai = new OpenAI({
+          apiKey: AZURE_OPENAI_API_KEY,
+          baseURL: AZURE_OPENAI_API_RESOURCE,
+          defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+          defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+        });
+      } else {
+        openai = new OpenAI();
+      }
 
       const response = await openai.files.create({
         file: fileStream, // Use the ReadStream for uploading

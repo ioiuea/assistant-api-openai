@@ -19,12 +19,17 @@ export async function GET(request: NextRequest) {
   if (!fileId)
     return Response.json({ error: "No file id provided" }, { status: 400 });
 
-  const openai = new OpenAI({
-    apiKey: AZURE_OPENAI_API_KEY,
-    baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
-    defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-    defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-  });
+  let openai;
+  if (process.env.AZURE_OPENAI_API === 'true') {
+    openai = new OpenAI({
+      apiKey: AZURE_OPENAI_API_KEY,
+      baseURL: AZURE_OPENAI_API_RESOURCE,
+      defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+      defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+    });
+  } else {
+    openai = new OpenAI();
+  }
 
   try {
     const deletedFile = await openai.beta.assistants.files.del(
@@ -32,7 +37,7 @@ export async function GET(request: NextRequest) {
       fileId
     );
 
-    console.log(deletedFile);
+    // console.log(deletedFile);
 
     return Response.json(deletedFile);
   } catch (e) {

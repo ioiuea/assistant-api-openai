@@ -13,17 +13,22 @@ export async function GET(request: NextRequest) {
   if (!assistantId)
     return Response.json({ error: "No id provided" }, { status: 400 });
 
-    const openai = new OpenAI({
+  let openai;
+  if (process.env.AZURE_OPENAI_API === 'true') {
+    openai = new OpenAI({
       apiKey: AZURE_OPENAI_API_KEY,
-      baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
+      baseURL: AZURE_OPENAI_API_RESOURCE,
       defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
       defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
     });
+  } else {
+    openai = new OpenAI();
+  }
 
   try {
     const assistantFiles = await openai.beta.assistants.files.list(assistantId);
 
-    console.log(assistantFiles);
+    // console.log(assistantFiles);
 
     return Response.json({ assistantFiles: assistantFiles });
   } catch (e) {

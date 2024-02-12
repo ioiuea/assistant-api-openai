@@ -13,17 +13,22 @@ export async function GET(request: NextRequest) {
   if (!threadId)
     return Response.json({ error: "No id provided" }, { status: 400 });
 
-  const openai = new OpenAI({
-    apiKey: AZURE_OPENAI_API_KEY,
-    baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
-    defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-    defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-  });
+  let openai;
+  if (process.env.AZURE_OPENAI_API === 'true') {
+    openai = new OpenAI({
+      apiKey: AZURE_OPENAI_API_KEY,
+      baseURL: AZURE_OPENAI_API_RESOURCE,
+      defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+      defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+    });
+  } else {
+    openai = new OpenAI();
+  }
 
   try {
     const response = await openai.beta.threads.messages.list(threadId);
 
-    console.log(response);
+    // console.log(response);
 
     return Response.json({ messages: response.data });
   } catch (e) {

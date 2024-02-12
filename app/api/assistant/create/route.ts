@@ -24,15 +24,20 @@ export async function GET(request: NextRequest) {
   const codeInterpreter = searchParams.get("code_interpreter") === 'true';
   const retrieval = searchParams.get("retrieval") === 'true';
 
-  const openai = new OpenAI({
-    apiKey: AZURE_OPENAI_API_KEY,
-    baseURL: `https://${AZURE_OPENAI_API_RESOURCE}.openai.azure.com/openai`,
-    defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-    defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
-  });
+  let openai;
+  if (process.env.AZURE_OPENAI_API === 'true') {
+    openai = new OpenAI({
+      apiKey: AZURE_OPENAI_API_KEY,
+      baseURL: AZURE_OPENAI_API_RESOURCE,
+      defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
+      defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
+    });
+  } else {
+    openai = new OpenAI();
+  }
 
-  console.log('Assistant Name:', assistantName);
-  console.log('Instructions:', instructions);
+  // console.log('Assistant Name:', assistantName);
+  // console.log('Instructions:', instructions);
 
   const tools: (AssistantToolsCode | AssistantToolsRetrieval)[] = [];
   if (codeInterpreter) {
@@ -50,7 +55,7 @@ export async function GET(request: NextRequest) {
       model: AZURE_OPENAI_API_DEPLOYMENT,
     });
 
-    console.log(assistant);
+    // console.log(assistant);
 
     return Response.json({ assistant: assistant });
   } catch (e) {
