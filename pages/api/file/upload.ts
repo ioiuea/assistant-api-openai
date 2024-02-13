@@ -1,7 +1,7 @@
 import {
   AZURE_OPENAI_API_KEY,
   AZURE_OPENAI_API_VERSION,
-  AZURE_OPENAI_API_RESOURCE
+  AZURE_OPENAI_API_ENDPOINT
 } from "@/const/default";
 import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm } from "formidable";
@@ -60,7 +60,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       if (process.env.AZURE_OPENAI_API === 'true') {
         openai = new OpenAI({
           apiKey: AZURE_OPENAI_API_KEY,
-          baseURL: AZURE_OPENAI_API_RESOURCE,
+          baseURL: AZURE_OPENAI_API_ENDPOINT,
           defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
           defaultHeaders: { 'api-key': AZURE_OPENAI_API_KEY },
         });
