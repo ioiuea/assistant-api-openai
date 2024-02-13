@@ -27,8 +27,21 @@ export async function GET(request: NextRequest) {
 
   try {
     const assistantFiles = await openai.beta.assistants.files.list(assistantId);
+    const newData = [];
 
-    // console.log(assistantFiles);
+    for (const file of assistantFiles.data) {
+      const fileDetail = await openai.files.retrieve(file.id);
+      const newFile = {
+        ...file,
+        name: fileDetail.filename
+      };
+      newData.push(newFile);
+    }
+
+    assistantFiles.data = newData;
+
+    console.log(assistantFiles);
+    console.log(assistantFiles.data);
 
     return Response.json({ assistantFiles: assistantFiles });
   } catch (e) {

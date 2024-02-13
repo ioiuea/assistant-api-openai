@@ -206,6 +206,8 @@ const AssistantChat = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      console.log("formData", formData.get("file"));
+
       // Send the FormData object directly
       const response = await axios.post<{ file: FileObject }>(
         "/api/file/upload",
@@ -669,10 +671,10 @@ const AssistantChat = () => {
                         <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                           {attachedFile ? (
                             attachedFile.data.length > 0 ? (
-                              attachedFile.data.map((file, index) => (
+                              attachedFile.data.map((file: any, index) => (
                                 <div key={index} className="flex items-center mt-2" style={{ minHeight: '24px' }}>
                                   <input type="radio" id={file.id} name="attachedFile" value={file.id} onChange={(e) => setSelectedFile(e.target.value)} className="form-radio h-4 w-4 text-blue-600" checked={selectedFile === file.id} />
-                                  <label htmlFor={file.id} className="ml-2 block text-sm text-gray-900">{file.id}</label>
+                                  <label htmlFor={file.id} className="ml-2 block text-sm text-gray-900">{file.name}</label>
                                   {selectedFile === file.id && (
                                     <button onClick={() => handleFileDelete(selectedFile)} disabled={!selectedFile} className="ml-2 py-1 px-2 bg-slate-500 text-white rounded">
                                       {fileDeleting ? <FiLoader /> : <FiTrash2 />}
@@ -709,7 +711,7 @@ const AssistantChat = () => {
                       onClick={handleThreadDelete}
                       disabled={!thread}
                       className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-10 py-8 bg-primary text-primary-foreground w-36 bg-slate-300"
-                      >
+                    >
                       {threadDeleting ? "Deleting..." : "Delete"}
                     </button>
                   </div>
